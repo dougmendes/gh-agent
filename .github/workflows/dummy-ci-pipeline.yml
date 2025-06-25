@@ -1,0 +1,74 @@
+name: ci-pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo Test Stage
+        run: |
+          echo "Running tests..."
+          echo "All tests passed!"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Echo Build Stage
+        run: |
+          echo "Building project..."
+          echo "Build successful."
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Echo Deploy Stage
+        run: |
+          echo "Deploying project..."
+          echo "Deployment complete."
+  
+  send-metadata:
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions:
+      id-token: write
+      contents: read  
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: eu-north-1  # ou us-east-1, etc.
+        
+      - name: Install AWS CLI 
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+        
+      - name: Send metadata to SQS
+        env:
+          QUEUE_URL: https://sqs.eu-north-1.amazonaws.com/239613528054/AnalyzeLogs
+        run: |
+          ORG_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          WORKFLOW_FILE="${{ github.workflow }}"
+          BRANCH_NAME="${{ github.ref_name }}"
+        
+          JSON_PAYLOAD=$(jq -n \
+            --arg org "$ORG_NAME" \
+            --arg repo "$REPO_NAME" \
+            --arg workflow "$WORKFLOW_FILE" \
+            --arg branch "$BRANCH_NAME" \
+            '{orgname: $org, reponame: $repo, workflowfilename: $workflow, branchname: $branch}')
+        
+          echo "Sending payload: $JSON_PAYLOAD"
+        
+          aws sqs send-message \
+            --queue-url "$QUEUE_URL" \
+            --message-body "$JSON_PAYLOAD"  
