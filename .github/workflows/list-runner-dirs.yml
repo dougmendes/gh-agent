@@ -1,0 +1,36 @@
+name: List Runner Work Directories
+
+on:
+  workflow_dispatch:
+
+jobs:
+  list-runner-dirs:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print runner directory
+        run: |
+          echo "Runner Directory:"
+          pwd
+
+      - name: List _work directory
+        run: |
+          echo "Listing contents of the _work directory..."
+          ls -lah ${{ runner.workspace }}
+
+      - name: List _temp directory
+        run: |
+          echo "Listing contents of the _temp directory..."
+          ls -lah ${{ runner.workspace }}/_temp || echo "_temp not found"
+
+      - name: List _diag directory
+        run: |
+          echo "Listing contents of the _diag directory..."
+          ls -lah ../_diag || echo "_diag not found"
+
+      - name: List full runner workspace
+        run: |
+          echo "Full tree from runner workspace:"
+          find ${{ runner.workspace }} -type f | tee /tmp/full_runner_tree.txt
