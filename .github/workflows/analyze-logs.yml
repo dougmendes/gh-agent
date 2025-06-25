@@ -22,5 +22,6 @@ jobs:
       - name: Run log collector
         run: |
           go run main.go
+          ls -l logs/unzipped/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
