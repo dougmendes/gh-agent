@@ -1,0 +1,41 @@
+name: Analyze Workflow Logs
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  wait-for-completion-and-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Wait until all relevant workflows complete
+        run: |
+          echo "Checking status of relevant workflows..."
+          WORKFLOWS=$(gh api repos/${{ github.repository }}/actions/workflows --jq '.workflows[].name')
+          for wf in $WORKFLOWS; do
+            echo "Checking $wf"
+            latest_status=$(gh api repos/${{ github.repository }}/actions/workflows/"$wf"/runs \
+              --jq '.workflow_runs | map(select(.status != "completed")) | length')
+
+            if [[ "$latest_status" != "0" ]]; then
+              echo "Workflow $wf still running or queued. Exiting."
+              exit 1
+            fi
+          done
+          echo "All workflows completed."
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run log collector
+        run: |
+          go run scripts/log_collector/main.go
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
