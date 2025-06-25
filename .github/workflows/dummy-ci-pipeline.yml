@@ -53,7 +53,7 @@ jobs:
           ORG_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
           WORKFLOW_FILE="${{ github.workflow }}"
-          BRANCH_NAME="${{ github.ref_name }}"
+          BRANCH_NAME="${{ github.head_ref || github.ref_name  }}"
         
           JSON_PAYLOAD=$(jq -n \
             --arg org "$ORG_NAME" \
