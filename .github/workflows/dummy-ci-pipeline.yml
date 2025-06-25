@@ -46,11 +46,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: eu-north-1  # ou us-east-1, etc.
         
-      - name: Install AWS CLI 
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-        
       - name: Send metadata to SQS
         env:
           QUEUE_URL: https://sqs.eu-north-1.amazonaws.com/239613528054/AnalyzeLogs
