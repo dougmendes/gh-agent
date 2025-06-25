@@ -1,7 +1,7 @@
 name: Analyze Workflow Logs
 
 on:
-  workflow_dispatch:  # Pode mudar para schedule se quiser rodar automaticamente
+  workflow_dispatch: 
 
 jobs:
   wait-for-completion-and-analyze:
