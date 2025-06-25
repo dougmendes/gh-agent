@@ -1,7 +1,9 @@
 name: List Runner Work Directories
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   list-runner-dirs:
