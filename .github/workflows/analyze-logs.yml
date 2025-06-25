@@ -1,13 +1,10 @@
 name: Analyze Workflow Logs
 
 on:
-  workflow_dispatch: 
-    inputs:
-      triggered_by:
-        description: 'Who triggered the analysis'
-        required: false
-        default: 'lambda'
-
+  workflow_run:
+    workflows: ["ci-pipeline"]
+    types:
+      - completed
 jobs:
   log-collector:
     runs-on: ubuntu-latest
