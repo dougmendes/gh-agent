@@ -9,7 +9,7 @@ on:
         default: "automation"
 
 jobs:
-  wait-for-completion-and-analyze:
+  log-analyze:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

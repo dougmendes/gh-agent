@@ -19,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - name: Show PR diff for lambdas
+        run: |
+          gh pr diff --path lambda/lambda.go --exit-code || echo "No changes in lambda/lambda.go"
+
       - name: Echo Build Stage
         run: |
           echo "Building project..."
