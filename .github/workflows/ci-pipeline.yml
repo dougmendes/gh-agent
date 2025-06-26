@@ -21,8 +21,12 @@ jobs:
     steps:
       - name: Show PR diff for lambdas
         run: |
-          gh pr diff --path lambda/lambda.go --exit-code || echo "No changes in lambda/lambda.go"
-
+          if gh pr diff ${{ github.event.pull_request.number }} --name-only | grep -q '^lambda/lambda.go$'; then
+            echo "Changes in lambda/lambda.go:"
+            gh pr diff ${{ github.event.pull_request.number }} -- lambda/lambda.go
+          else
+            echo "No changes in lambda/lambda.go"
+          fi
       - name: Echo Build Stage
         run: |
           echo "Building project..."
