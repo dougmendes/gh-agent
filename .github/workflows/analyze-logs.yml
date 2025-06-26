@@ -2,6 +2,11 @@ name: Analyze Workflow Logs
 
 on:
   workflow_dispatch: 
+    inputs:
+      triggered_by:
+        description: "Trigger"
+        required: false
+        default: "automation"
 
 jobs:
   wait-for-completion-and-analyze:
