@@ -1,3 +1,5 @@
+github.com/aws/aws-lambda-go v1.49.0 h1:z4VhTqkFZPM3xpEtTqWqRqsRH4TZBMJqTkRiBPYLqIQ=
+github.com/aws/aws-lambda-go v1.49.0/go.mod h1:dpMpZgvWx5vuQJfBt0zqBha60q7Dd7RfgJv23DymV8A=
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-github/v59 v59.0.0 h1:7h6bgpF5as0YQLLkEiVqpgtJqjimMYhBkD4jT5aN3VA=
 github.com/google/go-github/v59 v59.0.0/go.mod h1:rJU4R0rQHFVFDOkqGWxfLNo6vEk4dv40oDjhV/gH6wM=
