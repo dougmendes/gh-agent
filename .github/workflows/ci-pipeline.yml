@@ -4,6 +4,9 @@ on:
   pull_request:
       branches:
         - main
+  push:
+      branches:
+        - main
  
 
 jobs:
@@ -28,7 +31,7 @@ jobs:
         run: |
           if gh pr diff ${{ github.event.pull_request.number }} --name-only | grep -q '^lambda/lambda.go$'; then
             echo "Changes in lambda/lambda.go:"
-            gh pr diff ${{ github.event.pull_request.number }} -- lambda/lambda.go
+            gh pr diff ${{ github.event.pull_request.number }} --name-only | grep '^lambda/lambda.go$'
           else
             echo "No changes in lambda/lambda.go"
           fi
