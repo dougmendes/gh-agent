@@ -1,23 +1,28 @@
 package main
 
 import (
-	"archive/zip"
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 
+	"github.com/dougmendes/gh-agent/utils"
 	"github.com/google/go-github/v59/github"
+	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 )
 
 func main() {
 	// CONFIG
-	owner := "dougmendes"
-	repo := "gh-agent"
-	workflowFileName := "dummy-ci-pipeline.yml"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	owner := os.Getenv("OWNER")
+	repo := os.Getenv("REPO")
+	workflowFileName := os.Getenv("WORKFLOWFILENAME")
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		fmt.Println("GITHUB_TOKEN is not set")
@@ -97,51 +102,8 @@ func main() {
 	fmt.Println("Logs saved to", outFile)
 
 	// UNZIP LOGS
-	if err := unzip(outFile, "logs/unzipped"); err != nil {
+	if err := utils.Unzip(outFile, "logs/unzipped"); err != nil {
 		panic(err)
 	}
 	fmt.Println("Logs unzipped to logs/unzipped/")
-}
-
-func unzip(src, dest string) error {
-	r, err := zip.OpenReader(src)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	os.MkdirAll(dest, 0755)
-
-	for _, f := range r.File {
-		fpath := filepath.Join(dest, f.Name)
-
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(fpath, f.Mode())
-			continue
-		}
-
-		if err := os.MkdirAll(filepath.Dir(fpath), 0755); err != nil {
-			return err
-		}
-
-		dstFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			return err
-		}
-
-		fileInArchive, err := f.Open()
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(dstFile, fileInArchive)
-
-		dstFile.Close()
-		fileInArchive.Close()
-
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
